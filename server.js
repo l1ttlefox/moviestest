@@ -7,6 +7,9 @@ var bodyParser = require('body-parser');
 var app        = express();
 var morgan     = require('morgan');
 
+
+
+
 // configure app
 app.use(morgan('dev')); // log requests to the console
 
@@ -35,7 +38,8 @@ router.use(function(req, res, next) {
 
 // test route to make sure everything is working (accessed at GET http://localhost:8080/api)
 router.get('/', function(req, res) {
-  res.json({ message: 'hooray! welcome to our api!' });
+  res.sendfile('index.html');
+  // res.json({ message: 'hooray! welcome to our api!' });
 });
 
 // on routes that end in /movies

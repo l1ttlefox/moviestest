@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Movies</title>
+    <!-- Latest compiled and minified CSS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div>
+                <table id="table">
+                    <thead>
+                        <tr>
+                            <th>
+                                ID
+                            </th>
+                            <th>
+                                TITLE
+                            </th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script>
+
+      (function () {
+        var arr = [];
+
+        var table = document.getElementById('table');
+
+        function createTable(array) {
+          console.log(array);
+          var arrayLength = array.length, i = 0, html = '';
+          for (i; i < arrayLength; i+=1){
+            console.log(i);
+            html+= '<tr><td>' + array[i]._id + '</td><td>' + array[i].title || array[i].name +  '</td></tr>';
+          }
+          return html;
+        }
+
+
+        fetch('/api/movies')
+          .then(function(response) {
+            if (response.status >= 400) {
+              throw new Error("Bad response from server");
+            }
+            return response.json();
+          })
+          .then(function(movies) {
+            var tableBody  = createTable(movies);
+            console.log(tableBody);
+          });
+
+      } ());
+    </script>
+</body>
+</html>
