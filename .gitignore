@@ -16,6 +16,11 @@ coverage
 # Grunt intermediate storage (http://gruntjs.com/creating-plugins#storing-task-files)
 .grunt
 
+# Ignore everything within .idea folder, except codeStyleSettings which is shared across the team
+/.idea/**/*
+!.idea/codeStyleSettings.xml
+*.iml
+
 # Compiled binary addons (http://nodejs.org/api/addons.html)
 build/Release
 
