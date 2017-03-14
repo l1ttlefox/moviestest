@@ -50,16 +50,16 @@ router.route('/movies')
   .post(function(req, res) {
 
     var movie = new Movie();		// create a new instance of the Movie model
-    movie.title = req.body.title;  // set the movies name (comes from the request)
-    movie.description = req.body.description;  // set the movies name (comes from the request)
+    movie.title = req.body.title;
+    movie.description = req.body.description;
     movie.rating = req.body.rating;
-    movie.released = req.body.rating;
+    movie.released = req.body.released;
 
-    movie.save(function(err) {
-      if (err)
+    movie.save(function(err, movie) {
+      if (err) {
         res.send(err);
-
-      res.json({ message: 'Movie created!' });
+      }
+      res.json(movie);
     });
 
 
@@ -68,8 +68,9 @@ router.route('/movies')
   // get all the movies (accessed at GET http://localhost:8080/api/movies)
   .get(function(req, res) {
     Movie.find(function(err, movies) {
-      if (err)
+      if (err) {
         res.send(err);
+      }
 
       res.json(movies);
     });
@@ -82,8 +83,10 @@ router.route('/movies/:movie_id')
 // get the movie with that id
   .get(function(req, res) {
     Movie.findById(req.params.movie_id, function(err, movie) {
-      if (err)
+      if (err) {
         res.send(err);
+      }
+
       res.json(movie);
     });
   })
@@ -92,14 +95,18 @@ router.route('/movies/:movie_id')
   .put(function(req, res) {
     Movie.findById(req.params.movie_id, function(err, movie) {
 
-      if (err)
+      if (err) {
         res.send(err);
+      }
+      movie.title = req.body.title;
+      movie.description = req.body.description;
+      movie.rating = req.body.rating;
+      movie.released = req.body.released;
 
-      movie.name = req.body.name;
       movie.save(function(err) {
-        if (err)
+        if (err) {
           res.send(err);
-
+        }
         res.json({ message: 'Movie updated!' });
       });
 
@@ -110,7 +117,7 @@ router.route('/movies/:movie_id')
   .delete(function(req, res) {
     Movie.remove({
       _id: req.params.movie_id
-    }, function(err, movie) {
+    }, function(err) {
       if (err)
         res.send(err);
 

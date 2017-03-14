@@ -9,55 +9,162 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 </head>
 <body>
-    <div class="container">
-        <div class="row">
-            <div>
-                <table id="table">
-                    <thead>
-                        <tr>
-                            <th>
-                                ID
-                            </th>
-                            <th>
-                                TITLE
-                            </th>
-                        </tr>
-                    </thead>
-                </table>
-            </div>
+<div class="container" ng-app="myApp" ng-controller="myCtrl">
+    <div class="row">
+        <div class="page-header">
+            <h1>Movies <small>manager</small></h1>
         </div>
     </div>
-    <script>
+    <div class="row">
+        <form class="form-horizontal">
+            <div class="form-group">
+                <label for="inputEmail3" class="col-sm-2 control-label">Title</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" id="inputEmail3" placeholder="Title" ng-model="movie.title">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="inputPassword4" class="col-sm-2 control-label">Description</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" id="inputPassword4" placeholder="Description" ng-model="movie.description">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="inputPassword5" class="col-sm-2 control-label">Date</label>
+                <div class="col-sm-10">
+                    <input type="date" class="form-control" id="inputPassword5" placeholder="Date" ng-model="movie.released">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="inputPassword6" class="col-sm-2 control-label">Rating</label>
+                <div class="col-sm-10">
+                    <input type="number" class="form-control" id="inputPassword6" placeholder="Rating" ng-model="movie.rating">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10" ng-if="editMode">
+                    <button type="submit" class="btn btn-default" ng-click="update(movie)">UPDATE</button>
+                    <button type="button" class="btn btn-default" ng-click="cancel()">Cancel</button>
+                </div>
+                <div class="col-sm-offset-2 col-sm-10" ng-if="!editMode">
+                    <button type="submit" class="btn btn-success" ng-click="add(movie)">Add new movie</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="row">
+        <div></div>
+        <div>
+            <table id="table" class="table stripped">
+                <thead>
+                <tr>
+                    <th>
+                        TITLE
+                    </th>
+                    <th style="width: 40%">
+                        DESCRIPTION
+                    </th>
+                    <th>
+                        DATE
+                    </th>
+                    <th>
+                        RATING
+                    </th>
+                    <th>
+                        BUTTON
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="movie in movies">
 
-      (function () {
-        var arr = [];
+                    <td>
+                        {{ movie.title }}
+                    </td>
+                    <td style="width: 40%">
+                        {{ movie.description }}
+                    </td>
+                    <td>
+                        {{ movie.released | date: 'yyyy-MM-dd' }}
+                    </td>
+                    <td>
+                        {{ movie.rating }}
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-danger" ng-click="delete(movie._id, $index)">Delete</button>
+                        <button type="button" class="btn btn-primary" ng-click="putItemToUpdate(movie, movie._id, $index)">Edit</button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
 
-        var table = document.getElementById('table');
+        </div>
+    </div>
+</div>
+<script>
 
-        function createTable(array) {
-          console.log(array);
-          var arrayLength = array.length, i = 0, html = '';
-          for (i; i < arrayLength; i+=1){
-            console.log(i);
-            html+= '<tr><td>' + array[i]._id + '</td><td>' + array[i].title || array[i].name +  '</td></tr>';
-          }
-          return html;
-        }
+  (function () {
+    var app = angular.module('myApp', []);
+    app.controller('myCtrl', function($scope, $http) {
+
+      $scope.movie = {};
+      $scope.editMode = false;
 
 
-        fetch('/api/movies')
+      $scope.add = function (movie) {
+
+        $http.post("/api/movies", movie)
           .then(function(response) {
-            if (response.status >= 400) {
-              throw new Error("Bad response from server");
-            }
-            return response.json();
-          })
-          .then(function(movies) {
-            var tableBody  = createTable(movies);
-            console.log(tableBody);
+            $scope.movies.push(Object.assign(movie, response.data));
           });
+        $scope.movie = {};
+      };
 
-      } ());
-    </script>
+      $scope.putItemToUpdate = function (newMovie, id, index) {
+        $scope.editMode = true;
+        $scope.movie = newMovie;
+        $scope.movie.released = new Date(newMovie.released);
+        $scope.index = index;
+      };
+
+      $scope.cancel = function() {
+        $scope.movie = {};
+        $scope.editMode = false;
+      };
+
+      $scope.update = function (movie) {
+
+        $http.put("/api/movies/" + movie._id, movie)
+          .then(function() {
+            $scope.movies[$scope.index] = movie;
+          });
+        $scope.index = null;
+        $scope.editMode = false;
+        $scope.movie = {};
+      };
+
+
+      $scope.delete = function (id, index) {
+        $http.delete("/api/movies/" + id)
+          .then(function() {
+            $scope.movies.splice(index, 1);
+          });
+      };
+
+
+
+
+      $http.get("/api/movies")
+        .then(function(response) {
+          $scope.movies = response.data.reverse();
+        });
+
+
+    });
+
+
+
+  } ());
+</script>
 </body>
 </html>

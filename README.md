@@ -11,6 +11,7 @@ Using the new Express 4.0 Router to build an API
 - Clone the repo: `git clone https://github.com/l1ttlefox/moviestest.git`
 - Install dependencies: `npm install`
 - Start the server: `node server.js`
+- Open in your browser `http://localhost:8080/api/`
 
 ## Testing the API
 Test your API using [Postman](https://chrome.google.com/webstore/detail/postman-rest-client-packa/fhbjgbiflinjbdggehcddcbncdddomop)
