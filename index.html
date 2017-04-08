@@ -107,7 +107,6 @@
     var app = angular.module('myApp', []);
     app.controller('myCtrl', function($http) {
       var self = this;
-      self.sortReverse = false;
       self.movie = {};
       self.editMode = false;
 
@@ -116,7 +115,7 @@
 
         $http.post("/api/movies", movie)
           .then(function(response) {
-            self.movies.push(Object.assign(movie, response.data));
+            self.movies.push(response.data);
           });
         self.movie = {};
       };
@@ -157,7 +156,7 @@
 
       $http.get("/api/movies")
         .then(function(response) {
-          self.movies = response.data.reverse();
+          self.movies = response.data;
         });
 
 
