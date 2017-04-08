@@ -39,7 +39,6 @@ router.use(function(req, res, next) {
 // test route to make sure everything is working (accessed at GET http://localhost:8080/api)
 router.get('/', function(req, res) {
   res.sendfile('index.html');
-  // res.json({ message: 'hooray! welcome to our api!' });
 });
 
 // on routes that end in /movies
@@ -50,10 +49,7 @@ router.route('/movies')
   .post(function(req, res) {
 
     var movie = new Movie();		// create a new instance of the Movie model
-    movie.title = req.body.title;
-    movie.description = req.body.description;
-    movie.rating = req.body.rating;
-    movie.released = req.body.released;
+    Object.assign(movie, req.body);
 
     movie.save(function(err, movie) {
       if (err) {
@@ -73,8 +69,9 @@ router.route('/movies')
       }
 
       res.json(movies);
-    });
+    }).sort({ [req.query.order]: req.query.sort || 1 });
   });
+
 
 // on routes that end in /movies/:movie_id
 // ----------------------------------------------------
@@ -98,10 +95,7 @@ router.route('/movies/:movie_id')
       if (err) {
         res.send(err);
       }
-      movie.title = req.body.title;
-      movie.description = req.body.description;
-      movie.rating = req.body.rating;
-      movie.released = req.body.released;
+      Object.assign(movie, req.body);
 
       movie.save(function(err) {
         if (err) {
